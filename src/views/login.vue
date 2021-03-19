@@ -1,65 +1,134 @@
 <template>
   <div class="main">
-    <header>登录</header>
     <div class="loginbar">
-      <section>
-        <span id="login-msg" class="hidden-xs-only">账号：</span>
-        <el-input style="" placeholder="请输入账号" v-model="username" clearable  autofocus></el-input>
-      </section>
-      <section>
-        <span id="login-msg" class="hidden-xs-only">密码：</span>
-        <el-input placeholder="请输入密码" v-model="password" show-password clearable ></el-input>
-      </section>
-      <section>
-      <el-button round @click="loginCheck">登录</el-button>
-      </section>
+      <el-form ref="loginformRef" :model="loginform" :rules="loginRules">
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginform.username"
+            placeholder="Username"
+            prefix-icon="iconfont icon-users"
+            id="login-input"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="password">
+          <el-input
+            type="password"
+            v-model="loginform.password"
+            placeholder="Password"
+            prefix-icon="iconfont icon-3702mima"
+            id="login-input"
+            show-password
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button @click="loginSumit('loginformRef')" round>登录</el-button>
+
+          <el-button @click="loginReset('loginformRef')" round>重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  data () {
+  data() {
+    const usercheck = (rule, value, callbak) => {
+      if (!value) {
+        callbak(new Error('账号不可为空'))
+      } else if (value.length <= 3) {
+        callbak(new Error('账号长度不可少于3位'))
+      } else {
+        callbak()
+      }
+    }
     return {
-      username: '',
-      password: ''
+      loginform: {
+        username: 'admin',
+        password: '123456'
+      },
+      loginRules: {
+        username: [{ validator: usercheck, trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+      }
     }
   },
   methods: {
-    loginCheck: async function () {
-      if (this.username === '' || this.password === '') {
-        alert('请输入账号或密码')
-      };
-      this.$axios.post('http://localhost:8888/login', {
-        username: this.username,
-        password: this.password
-      }).then(data => console.log(data))
-      console.log(this.username, this.password)
+    loginSumit: function(target) {
+      const that = this
+      // 自定义验证
+      this.$refs[target].validate(async (valid, callbak) => {
+        if (valid) {
+          const { data } = await this.$axios.post('/login', this.loginform)
+          if (data.meta.status !== 200) {
+            this.$message.error({
+              message: '账号密码错误',
+              showClose: true
+            })
+            return this.$refs[target].resetFields()
+          } else {
+            this.$message.success({
+              message: '登录成功！1秒后跳转管理页面',
+              showClose: true,
+              duration: 1000
+            })
+            sessionStorage.setItem('token', data.data.token)
+            setTimeout(function() {
+              that.$router.push('/Home')
+            }, 1000)
+          }
+        } else {
+          this.$message.warning({
+            message: '很抱歉，账号密码不符合规格',
+            showClose: true
+          })
+          return this.$refs[target].resetFields()
+        }
+      })
+    },
+    loginReset: function(data) {
+      return this.$refs[data].resetFields()
     }
-  },
-  beforeCreate () {
-    document.querySelector('body').classList.add('flex')
-  },
-  beforeDestroy () {
-    document.querySelector('body').classList.remove('flex')
   }
 }
 </script>
 <style scoped>
-.main{
+.main {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background: url('../assets/loginImg1.jpg') round;
+}
+
+.loginbar {
+  width: 21.277rem;
+  border-radius: 0.6rem;
+  box-shadow: 0rem 0rem 1rem -0.3404rem;
+}
+
+.el-form {
+  padding: 1rem;
+  text-align: center;
+}
+
+.el-form-item {
+  width: 80%;
+  margin: 1rem auto;
+}
+
+.el-button {
+  background: transparent;
   color: white;
 }
-header{
-  font-weight:400;
-  font-size: 1.875rem;
-}
-section{
-  margin-top: 1.25rem;
-}
-#login-msg{
-  font-size: 0.9rem;
-}
-.el-input{
-  width: 18.75rem!important;
+</style>
+<style>
+#login-input {
+  border: none;
+  border-bottom: 1px solid #dcdfe6;
+  background: transparent !important;
+  color: white;
 }
 </style>
