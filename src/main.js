@@ -14,7 +14,11 @@ import 'element-ui/lib/theme-chalk/display.css'
 Vue.use(ElementUI)
 // 设置默认axios路径
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
-
+// 设置axios拦截器
+axios.interceptors.request.use(config => {
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  return config
+})
 // 引入axios
 Vue.prototype.$axios = axios
 

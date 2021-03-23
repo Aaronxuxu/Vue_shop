@@ -6,11 +6,10 @@
           <el-input
             v-model="loginform.username"
             placeholder="Username"
-            prefix-icon="iconfont icon-users"
+            prefix-icon="iconfont icon-user"
             id="login-input"
           ></el-input>
         </el-form-item>
-
         <el-form-item prop="password">
           <el-input
             type="password"
@@ -21,17 +20,14 @@
             show-password
           ></el-input>
         </el-form-item>
-
-        <el-form-item>
+        <el-form-item id="btn-flex">
           <el-button @click="loginSumit('loginformRef')" round>登录</el-button>
-
           <el-button @click="loginReset('loginformRef')" round>重置</el-button>
         </el-form-item>
       </el-form>
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -101,12 +97,13 @@ export default {
   justify-content: center;
   align-items: center;
   background: url('../assets/loginImg1.jpg') round;
+  background-size: 100% 100%;
 }
 
 .loginbar {
   width: 21.277rem;
   border-radius: 0.6rem;
-  box-shadow: 0rem 0rem 1rem -0.3404rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 6px rgba(0, 0, 0, 1);
 }
 
 .el-form {
@@ -130,5 +127,9 @@ export default {
   border-bottom: 1px solid #dcdfe6;
   background: transparent !important;
   color: white;
+}
+#btn-flex {
+  display: flex;
+  justify-content: space-around;
 }
 </style>
