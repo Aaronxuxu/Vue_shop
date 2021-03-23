@@ -16,12 +16,32 @@
     </div>
     <div class="user_form">
       <el-table :data="tableData" border style="width: 100%" stripe>
-        <el-table-column type="index" label="#"></el-table-column>
-        <el-table-column prop="username" label="姓名"></el-table-column>
-        <el-table-column prop="email" label="邮箱"></el-table-column>
-        <el-table-column prop="mobile" label="电话"></el-table-column>
-        <el-table-column prop="role_name" label="角色"></el-table-column>
-        <el-table-column prop="mg_state" label="状态">
+        <el-table-column
+          type="index"
+          label="#"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="username"
+          label="姓名"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="email"
+          label="邮箱"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="mobile"
+          label="电话"
+          align="center"
+        ></el-table-column>
+        <el-table-column
+          prop="role_name"
+          label="角色"
+          align="center"
+        ></el-table-column>
+        <el-table-column prop="mg_state" label="状态" align="center">
           <template slot-scope="scope">
             <el-switch
               :value="scope.row.mg_state == true ? true : false"
@@ -62,7 +82,18 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="user_page"></div>
+    <div class="user_page">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[1, 2, 5, 10]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="totalpage"
+      >
+      </el-pagination>
+    </div>
 
     <!-- 添加/修改弹出框 -->
     <el-dialog
@@ -156,7 +187,10 @@ export default {
         ],
         mobile: [{ required: true, message: '请输入手机号码', trigger: 'blur' }]
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      currentPage: 1,
+      totalpage: 0,
+      pageSize: 2
     }
   },
   methods: {
@@ -171,13 +205,14 @@ export default {
     async getUsers() {
       const { data: res } = await this.$axios.get('/users', {
         params: {
-          pagenum: 1,
-          pagesize: 10
+          pagenum: this.currentPage,
+          pagesize: this.pageSize
         }
       })
       if (res.meta.status !== 200) {
         return this.showMessage('error', res.meta.msg + '获取用户信息失败')
       }
+      this.totalpage = res.data.total
       this.tableData = res.data.users
     },
     chanState: async function(row, index) {
@@ -256,10 +291,19 @@ export default {
         params: {
           query: this.searchName,
           pagenum: 1,
-          pagesize: 1
+          pagesize: 10
         }
       })
+      this.totalpage = res.data.total
       this.tableData = res.data.users
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getUsers()
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.getUsers()
     }
   },
   mounted() {
@@ -281,6 +325,13 @@ export default {
   justify-content: flex-start;
   margin-bottom: 1.5rem;
 }
+.user_form {
+  margin-bottom: 1.5rem;
+}
+.user_page {
+  display: flex;
+  justify-content: center;
+}
 .input {
   margin-right: 2rem;
 }
@@ -290,5 +341,20 @@ export default {
 #addUser {
   padding: 0.5rem 1rem;
   font-size: 0.7rem;
+}
+</style>
+<style>
+.el-pagination span,
+.el-pager li {
+  min-width: 1.511rem !important;
+  height: 1.194rem !important;
+  line-height: 1.194rem !important;
+  font-size: 0.553rem !important;
+}
+</style>
+<style>
+.el-table .cell {
+  display: flex;
+  justify-content: center;
 }
 </style>
