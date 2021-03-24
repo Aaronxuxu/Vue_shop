@@ -76,6 +76,7 @@
                 type="warning"
                 icon="el-icon-s-tools"
                 class="tableBtn"
+                @click="assign(editBtn.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -135,6 +136,36 @@
         >
       </div>
     </el-dialog>
+
+    <!-- 分配权限弹出框-->
+    <el-dialog title="分配角色" :visible.sync="RoleFormVisible">
+      <el-form :model="rolesform" ref="rolesform" :rules="rolesrules">
+        <el-form-item label="当前的用户：" :label-width="formLabelWidth">
+          {{ rolesBaseMsg.username }}
+        </el-form-item>
+        <el-form-item label="当前的角色：" :label-width="formLabelWidth">
+          {{ rolesBaseMsg.role_name }}
+        </el-form-item>
+        <el-form-item
+          label="分配新角色："
+          :label-width="formLabelWidth"
+          prop="id"
+        >
+          <el-select v-model="rolesform.id" placeholder="请选择">
+            <el-option
+              :label="item.roleName"
+              :value="item.id"
+              v-for="item in rolesList"
+              :key="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="RoleFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="affirm('rolesform')">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -162,7 +193,9 @@ export default {
     return {
       searchName: '',
       tableData: [],
+      rolesList: [],
       dialogFormVisible: false,
+      RoleFormVisible: false,
       dialogDel: false,
       isedit: false,
       userform: {
@@ -187,6 +220,11 @@ export default {
         ],
         mobile: [{ required: true, message: '请输入手机号码', trigger: 'blur' }]
       },
+      rolesrules: {
+        id: [{ required: true, message: '请选择', trigger: 'change' }]
+      },
+      rolesform: { id: '' },
+      rolesBaseMsg: [],
       formLabelWidth: '120px',
       currentPage: 1,
       totalpage: 0,
@@ -194,14 +232,6 @@ export default {
     }
   },
   methods: {
-    showMessage: function(v1, v2) {
-      this.$message({
-        type: v1,
-        message: v2,
-        showClose: true,
-        duration: 2000
-      })
-    },
     async getUsers() {
       const { data: res } = await this.$axios.get('/users', {
         params: {
@@ -304,6 +334,31 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val
       this.getUsers()
+    },
+    // 获取用户角色
+    async assign(scope) {
+      this.RoleFormVisible = true
+      this.rolesBaseMsg = scope
+      const { data: res } = await this.$axios.get('roles')
+      if (res.meta.status !== 200) {
+        return this.showMessage('error', res.meta.msg)
+      }
+      this.rolesList = res.data
+    },
+    affirm(ref) {
+      this.$refs[ref].validate(async v => {
+        if (!v) return
+        const { data: res } = await this.$axios.put(
+          '/users/' + this.rolesBaseMsg.id + '/role',
+          { rid: this.rolesform.id }
+        )
+        if (res.meta.status !== 200) {
+          return this.showMessage('error', res.meta.msg)
+        }
+        this.showMessage('success', res.meta.msg)
+        this.RoleFormVisible = false
+        return this.getUsers()
+      })
     }
   },
   mounted() {

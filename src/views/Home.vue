@@ -104,7 +104,7 @@ export default {
 
 .el-main {
   background-color: #eaedf1;
-  text-align: center;
+  /* text-align: center; */
 }
 .main_body {
   padding: 1rem;

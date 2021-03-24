@@ -21,7 +21,14 @@ axios.interceptors.request.use(config => {
 })
 // 引入axios
 Vue.prototype.$axios = axios
-
+Vue.prototype.showMessage = function(v1, v2) {
+  this.$message({
+    type: v1,
+    message: v2,
+    showClose: true,
+    duration: 2000
+  })
+}
 Vue.config.productionTip = false
 
 new Vue({
