@@ -146,7 +146,6 @@
       >
       </el-tree>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="setCheckedNodes">更新</el-button>
         <el-button @click="editRightsVisible = false">取 消</el-button>
         <el-button type="primary" @click="getCheckedKeys()">确 定</el-button>
       </div>
@@ -248,6 +247,7 @@ export default {
           this.showMessage('error', res.meta.msg)
         }
       }
+      this.$refs.roleForm.resetFields()
       this.dialogFormVisible = false
       return this.getRoles()
     },
@@ -317,7 +317,7 @@ export default {
       this.checkNodes = scope.children
       this.rightsList = res.data
       this.$nextTick(function() {
-        this.setCheckedNodes()
+        this.$refs.trees.setCheckedNodes(this.checkNodes)
       })
     },
     async getCheckedKeys() {
@@ -338,9 +338,6 @@ export default {
       this.showMessage('success', res.meta.msg)
       this.editRightsVisible = false
       return this.getRoles()
-    },
-    setCheckedNodes() {
-      this.$refs.trees.setCheckedNodes(this.checkNodes)
     }
   },
   mounted() {
