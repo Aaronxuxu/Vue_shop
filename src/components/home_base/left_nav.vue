@@ -55,8 +55,8 @@ export default {
         111: 'icon-users',
         112: 'icon-user',
         104: 'icon-shangpin',
-        115: '',
-        121: '',
+        115: 'icon-shangpin',
+        121: 'icon-shangpin',
         107: 'icon-danju',
         146: 'icon-baobiao'
       }

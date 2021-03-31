@@ -59,6 +59,10 @@ const routes = [{
       path: '/categories',
       component: () => import('../components/shops/categories_manage.vue')
     },
+    {
+      path: '/goods/add',
+      component: () => import('../components/shops/shop_Add.vue')
+    },
 
     // 用户
     {
