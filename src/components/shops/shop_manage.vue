@@ -2,7 +2,13 @@
   <div class="goods_main">
     <div class="goods_search">
       <div class="input">
-        <el-input placeholder="请输入商品名称" clearable v-model="shopName">
+        <el-input
+          placeholder="请输入商品名称"
+          clearable
+          @clear="clearSeach"
+          v-model.trim="shopName"
+          @keyup.enter.native="serachName"
+        >
           <el-button
             slot="append"
             icon="el-icon-search"
@@ -92,33 +98,22 @@ export default {
   methods: {
     //  获取商品列表数据
     async getGoods(query) {
-      var pagenum = 1
-      var pagesize = 5
-      if (!query) {
-        pagenum = this.pagenum
-        pagesize = this.pagesize
-      }
       const { data: res } = await this.$axios.get('/goods', {
         params: {
           query: query,
-          pagenum: pagenum,
-          pagesize: pagesize
+          pagenum: this.pagenum,
+          pagesize: this.pagesize
         }
       })
       if (res.meta.status !== 200) {
         return this.showMessage('error', res.meta.msg)
       }
-      if (query) {
-        if (res.data.goods.length === 0) {
-          this.showMessage('warning', '很抱歉,没有找到此商品')
-        } else {
-          this.showMessage('success', res.meta.msg)
-        }
-      } else {
-        if (res.data.goods.length === 0) {
-          this.pagenum -= 1
-          this.getGoods()
-        }
+
+      if (this.pagenum === 1 && res.data.goods.length === 0) {
+        this.showMessage('warning', '很抱歉,没有找到此商品')
+      } else if (this.pagenum !== 1 && res.data.goods.length === 0) {
+        this.pagenum -= 1
+        this.getGoods(query)
       }
       this.totalpage = res.data.total
       this.goodsList = res.data.goods
@@ -131,13 +126,13 @@ export default {
     // 切换每页显示的数量
     handleSizeChange(val) {
       this.pagesize = val
-      this.getGoods()
+      this.getGoods(this.shopName)
     },
 
     // 切换当前页
     handleCurrentChange(val) {
       this.pagenum = val
-      this.getGoods()
+      this.getGoods(this.shopName)
     },
 
     // 跳转添加商品页面
@@ -161,7 +156,7 @@ export default {
             return this.showMessage('error', res.meta.msg)
           }
           this.showMessage('success', res.meta.msg)
-          return this.getGoods()
+          return this.getGoods(this.shopName)
         })
         .catch(() => {
           this.$message({
@@ -170,23 +165,20 @@ export default {
           })
         })
     },
-    async serachName() {
-      var shopName = this.shopName.trim()
-      if (shopName.length === 0) return
-      this.getGoods(shopName)
+
+    serachName() {
+      if (this.shopName.length === 0) return
+      this.pagenum = 1
+      this.getGoods(this.shopName)
+    },
+    clearSeach() {
+      this.getGoods(this.shopName)
     }
   },
   mounted() {
-    this.getGoods()
+    this.getGoods(this.shopName)
   },
-  watch: {
-    shopName: function(newVal, oldVal) {
-      if (newVal.trim().length === 0) {
-        this.pagenum = 1
-        this.getGoods()
-      }
-    }
-  }
+  watch: {}
 }
 </script>
 <style scoped>

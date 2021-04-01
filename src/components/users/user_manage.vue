@@ -2,7 +2,12 @@
   <div class="user_main">
     <div class="user_search">
       <div class="input">
-        <el-input placeholder="请输入内容" v-model="searchName" clearable>
+        <el-input
+          placeholder="请输入内容"
+          v-model="searchName"
+          clearable
+          @keyup.enter.native="sechName"
+        >
           <el-button
             slot="append"
             icon="el-icon-search"
