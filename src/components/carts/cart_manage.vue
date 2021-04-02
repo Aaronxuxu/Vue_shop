@@ -181,9 +181,7 @@ export default {
       }
       this.total = res.data.total
       res.data.goods.forEach(element => {
-        element.create_time = this.$moment(element.create_time).format(
-          'YYYY-DD-MM'
-        )
+        element.create_time = this.$format(element.create_time, 'yyyy-dd-MM')
       })
       this.ordersList = res.data.goods
     },
@@ -212,9 +210,7 @@ export default {
     },
 
     // 省市区选择方法
-    handleChange(value) {
-      console.log(value)
-    },
+    handleChange(value) {},
 
     // 确认修改地址
     determine(ref) {
@@ -227,8 +223,6 @@ export default {
     // 获取物流进度弹出框
     async getLogistics(scope) {
       this.dialogText = true
-      const { data: res } = await this.$axios.get('/kuaidi/804909574412544580')
-      console.log(scope, res)
     }
   },
   mounted() {

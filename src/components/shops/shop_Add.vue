@@ -292,7 +292,6 @@ export default {
       const pics = {
         pic: response.data.tmp_path
       }
-      console.log(this.goodsForm)
       return this.goodsForm.pics.push(pics)
     },
 
@@ -306,7 +305,6 @@ export default {
         var goodForm = _.cloneDeep(this.goodsForm)
         goodForm.goods_cat = goodForm.goods_cat.join(',')
         const { data: res } = await this.$axios.post('/goods', goodForm)
-        console.log(goodForm)
         if (res.meta.status !== 201) {
           return this.showMessage('error', res.meta.msg)
         }

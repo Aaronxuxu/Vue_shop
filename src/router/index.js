@@ -1,7 +1,25 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import login from '../views/login.vue'
-import Home from '../views/Home.vue'
+// 路由懒加载
+const login = () => import(/* webpackChunkName: "indexHome" */ '../views/login.vue')
+const Home = () => import(/* webpackChunkName: "indexHome" */ '../views/Home.vue')
+
+// 管理页面首页
+const index = () => import(/* webpackChunkName: "HomeComIndex" */ '../components/index/index.vue')
+// 订单管理页面
+const orders = () => import(/* webpackChunkName: "HomeComOrder" */ '../components/carts/cart_manage.vue')
+// 数据图标页面
+const reports = () => import(/* webpackChunkName: "HomeComData" */ '../components/datas/data_manage.vue')
+// 权限管理页面
+const roles = () => import(/* webpackChunkName: "HomeComRoles" */ '../components/roles/role_manage.vue')
+const rights = () => import(/* webpackChunkName: "HomeComRoles" */ '../components/roles/rights_manage.vue')
+// 商品管理页面
+const goods = () => import(/* webpackChunkName: "HomeComGoods" */ '../components/shops/shop_manage.vue')
+const params = () => import(/* webpackChunkName: "HomeComGoods" */ '../components/shops/params_manage.vue')
+const categories = () => import(/* webpackChunkName: "HomeComGoods" */ '../components/shops/categories_manage.vue')
+const addGoods = () => import(/* webpackChunkName: "HomeComGoods" */ '../components/shops/shop_Add.vue')
+// 用户管理页面
+const users = () => import(/* webpackChunkName: "HomeComUsers" */ '../components/users/user_manage.vue')
 Vue.use(VueRouter)
 
 const routes = [{
@@ -22,52 +40,52 @@ const routes = [{
     // 欢迎首页
     {
       path: '/index',
-      component: () => import('../components/index/index.vue')
+      component: index
     },
     // 订单
     {
       path: '/orders',
-      component: () => import('../components/carts/cart_manage.vue')
+      component: orders
     },
 
     // 数据
     {
       path: '/reports',
-      component: () => import('../components/datas/data_manage.vue')
+      component: reports
     },
 
     // 权限
     {
       path: '/roles',
-      component: () => import('../components/roles/role_manage.vue')
+      component: roles
     },
     {
       path: '/rights',
-      component: () => import('../components/roles/rights_manage.vue')
+      component: rights
     },
 
     // 商品
     {
       path: '/goods',
-      component: () => import('../components/shops/shop_manage.vue')
+      component: goods
     },
     {
       path: '/params',
-      component: () => import('../components/shops/params_manage.vue')
+      component: params
     },
     {
       path: '/categories',
-      component: () => import('../components/shops/categories_manage.vue')
+      component: categories
     },
     {
       path: '/goods/add',
-      component: () => import('../components/shops/shop_Add.vue')
+      component: addGoods
     },
 
     // 用户
     {
       path: '/users',
-      component: () => import('../components/users/user_manage.vue')
+      component: users
     }
   ]
 }

@@ -112,22 +112,22 @@ export default {
 </script>
 <style scoped>
 .el-col-12 {
-  width: auto;
+  width: 100%;
   height: 100%;
 }
 .el-button {
   width: 100%;
-  color: white;
+  color: rgb(185, 181, 181);
   border-color: #4a5064;
   border-radius: 0;
   background-color: #4a5064;
 }
-</style>
-<style>
-.el-menu {
+.el-menu:not(.el-menu--collapse) {
   width: 10rem;
-  height: 100%;
   text-align: -webkit-left;
   border: none;
+}
+.el-menu {
+  height: 100%;
 }
 </style>

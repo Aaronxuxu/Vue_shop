@@ -118,7 +118,7 @@ export default {
       this.totalpage = res.data.total
       this.goodsList = res.data.goods
       res.data.goods.forEach(element => {
-        element.add_time = this.$moment(element.add_time).format('YYYY-DD-MM')
+        element.add_time = this.$format(element.add_time, 'yyyy-dd-MM')
       })
       return res.data
     },

@@ -4,8 +4,9 @@
       <div class="input">
         <el-input
           placeholder="请输入内容"
-          v-model="searchName"
+          v-model.trim="searchName"
           clearable
+          @clear="clearName"
           @keyup.enter.native="sechName"
         >
           <el-button
@@ -103,7 +104,7 @@
 
     <!-- 添加/修改弹出框 -->
     <el-dialog
-      title="添加用户"
+      :title="isedit === true ? '修改用户' : '添加用户'"
       :visible.sync="dialogFormVisible"
       :before-close="handleClose"
     >
@@ -237,15 +238,23 @@ export default {
     }
   },
   methods: {
-    async getUsers() {
+    async getUsers(query) {
       const { data: res } = await this.$axios.get('/users', {
         params: {
+          query: query,
           pagenum: this.currentPage,
           pagesize: this.pageSize
         }
       })
       if (res.meta.status !== 200) {
         return this.showMessage('error', res.meta.msg + '获取用户信息失败')
+      }
+      if (query && res.data.users.length === 0) {
+        this.showMessage('error', '该用户不存在')
+      }
+      if (this.currentPage > 1 && res.data.users.length === 0) {
+        this.currentPage -= 1
+        this.getUsers(this.searchName)
       }
       this.totalpage = res.data.total
       this.tableData = res.data.users
@@ -264,6 +273,7 @@ export default {
       this.$refs[data].resetFields()
       this.dialogFormVisible = false
     },
+
     open: function(data, index) {
       this.$confirm('此操作将永久删除用户，是否继续？', '提示', {
         confirmButtonText: '确定',
@@ -276,11 +286,12 @@ export default {
           if (res.meta.status !== 200) {
             return this.showMessage('error', res.meta.msg)
           }
-          this.getUsers()
+          this.getUsers(this.searchName)
           return this.showMessage('success', '删除成功')
         })
         .catch(() => this.showMessage('warning', '已取消删除'))
     },
+
     formUser: async function(data) {
       this.dialogFormVisible = true
       if (data) {
@@ -290,6 +301,7 @@ export default {
       }
       this.isedit = false
     },
+
     handleClose: function(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
@@ -298,6 +310,7 @@ export default {
         })
         .catch(_ => {})
     },
+
     addoreditUsers: async function(data) {
       if (!this.isedit) {
         delete this.userform.id
@@ -321,25 +334,22 @@ export default {
       this.getUsers()
       this.dialogFormVisible = false
     },
+
     sechName: async function() {
-      const { data: res } = await this.$axios.get('/users', {
-        params: {
-          query: this.searchName,
-          pagenum: 1,
-          pagesize: 10
-        }
-      })
-      this.totalpage = res.data.total
-      this.tableData = res.data.users
+      this.currentPage = 1
+      this.getUsers(this.searchName)
     },
+
     handleSizeChange(val) {
       this.pageSize = val
-      this.getUsers()
+      this.getUsers(this.searchName)
     },
+
     handleCurrentChange(val) {
       this.currentPage = val
-      this.getUsers()
+      this.getUsers(this.searchName)
     },
+
     // 获取用户角色
     async assign(scope) {
       this.RoleFormVisible = true
@@ -350,6 +360,7 @@ export default {
       }
       this.rolesList = res.data
     },
+
     affirm(ref) {
       this.$refs[ref].validate(async v => {
         if (!v) return
@@ -364,6 +375,11 @@ export default {
         this.RoleFormVisible = false
         return this.getUsers()
       })
+    },
+
+    // 清除搜索框内容
+    clearName() {
+      this.getUsers()
     }
   },
   mounted() {
